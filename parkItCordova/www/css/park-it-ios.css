@@ -1,0 +1,34 @@
+/**
+    Kianna Dyck
+    Bessy Torres-Miller
+    Cordova I - Pair Programming
+    park-it-ios.css
+**/
+
+body {
+    font-family: San Francisco, Helvetica, sans-serif ;
+    background-color: white;
+}
+
+#navbar {
+    background-color: white;
+    color: black;
+
+}
+
+button{
+    border: none;
+    background-color: white;
+    color: #0080ff;
+}
+
+#instructions, #map, #directions{
+    border-radius: 10px;
+    background-color: white;
+    border: 1px black solid;
+}
+
+#gotIt{
+    color: white;
+    border-radius: 5px;
+}
