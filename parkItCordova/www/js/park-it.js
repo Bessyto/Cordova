@@ -20,7 +20,6 @@ function init()
 
 function onDeviceReady()
 {
-    alert("on device ready");
     // Load the cuurent stylesheet, depending on the device
     // var node = document.createElement('link');
     // node.setAttribute('rel', 'stylesheet');
@@ -66,7 +65,8 @@ function initMap()
 }
 
 $("#park").click(function () {
-   alert("Set parking location");
+   //alert("Set parking location");
+    setParkingLocation();
 });
 
 $("#retrieve").click(function () {
@@ -76,3 +76,39 @@ $("#retrieve").click(function () {
 $("#gotIt").click(function () {
     $("#instructions").hide();
 });
+
+function setParkingLocation() {
+    navigator.geolocation.getCurrentPosition(setParkingLocationSuccess,
+        setParkingLocationError, {enableHighAccuracy:true});
+}
+
+function setParkingLocationSuccess(position){
+    latitude = position.coords.latitude;
+    storage.setItem("parkedLatitude", latitude);
+
+    //Add statement to storage the longitude
+    longitude = position.coords.longitude;
+    storage.setItem("parkedLongitude", longitude);
+
+    //Display an alert that shows the latitude and longitude
+    //Use navigator.notification.alert(msg)
+    navigator.notification.alert("Parking Location Saved. (Latitude: " + latitude + ", Longitude: " + longitude + ")");
+
+    showParkingLocation();
+}
+
+function setParkingLocationError(error) {
+    navigator.notification.alert("Error Code: " + error.code
+    + "\nError Message: " + error.message);
+}
+
+
+function showParkingLocation() {
+    navigator.notification.alert("You are parked at Lat: "
+    + storage.getItem("parkedLatitude")
+    + ", Long: " + storage.getItem("parkedLongitude"));
+
+    // hide directions and instructions
+    $("#instructions").hide();
+    $("#directions").hide();
+}
