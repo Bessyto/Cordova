@@ -58,10 +58,10 @@ function initMap()
     });
 
     // Point of interest inside map
-    var marker = new google.maps.Marker({
-        position: grc,
-        map: mapDiv
-    });
+    // var marker = new google.maps.Marker({
+    //     position: grc,
+    //     map: mapDiv
+    // });
 }
 
 $("#park").click(function () {
@@ -104,11 +104,90 @@ function setParkingLocationError(error) {
 
 
 function showParkingLocation() {
-    navigator.notification.alert("You are parked at Lat: "
-    + storage.getItem("parkedLatitude")
-    + ", Long: " + storage.getItem("parkedLongitude"));
+    // navigator.notification.alert("You are parked at Lat: "
+    // + storage.getItem("parkedLatitude")
+    // + ", Long: " + storage.getItem("parkedLongitude"));
 
     // hide directions and instructions
     $("#instructions").hide();
     $("#directions").hide();
+
+    // Create an object to store our latitude and longitude
+    var latLong = new google.maps.LatLng(latitude, longitude);
+
+    // Create a new map object
+    var map = new google.maps.Map(document.getElementById('map'));
+
+    //set the zoom on the map
+    map.setZoom(16);
+
+    //set center of the map
+    map.setCenter(latLong);
+
+    //set marker of map
+    var marker = new google.maps.Marker({
+        position: latLong,
+        map: map
+    });
+}
+
+
+function getParkingLocation() {
+    navigator.geolocation.getCurrentPosition(getParkingLocationSuccess,
+        getParkingLocationError, {enableHighAccuracy: true});
+}
+
+/* Takes a position object that defines and sets four variables to retrieve the location. */
+function getParkingLocationSuccess(position) {
+    // current latitude and longitude comes from position object
+    currentLatitude = position.coords.latitude;
+    currentLongitude = position.coords.longitude;
+
+    // parked latitude and longitude come from storage object
+    parkedLatitude = storage.getItem("parkedLatitude");
+    parkedLongitude = storage.getItem("parkedLongitude");
+
+    // shows route on map
+    showDirections();
+}
+
+function showDirections() {
+    // responsible for drawing the directions, both on the map and as a list in the directions div
+    var dRenderer = new google.maps.DirectionsRenderer;
+
+    // calculates the route between the endpoints on the map
+    var dService = new google.maps.DirectionsService;
+
+    var curLatLong = new google.maps.LatLng(currentLatitude, currentLongitude);
+    var parkedLatLong = new google.maps.LatLng(parkedLatitude, parkedLongitude);
+    var map = new google.maps.Map(document.getElementById("map"));
+
+    map.setZoom(16);
+    map.setCenter(curLatLong);
+
+    dRenderer.setMap(map);
+
+    dService.route({
+        origin: curLatLong,
+        destination: parkedLatLong,
+        travelMode: 'DRIVING'
+
+    }, function(response, status) {
+            if (status == 'OK') {
+                dRenderer.setDirections(response);
+                $('#directions').html('');
+                dRenderer.setPanel(document.getElementById('directions'));
+            } else {
+                navigator.notification.alert("Directions failed: " + status);
+            }
+        });
+
+    $('#map').show();
+    $('#directions').show();
+    $('#instructions').hide();
+}
+
+function getParkingLocationError(error) {
+    navigator.notification.alert("Error Code: " + error.code +
+    "\nError Message: " + error.message);
 }
